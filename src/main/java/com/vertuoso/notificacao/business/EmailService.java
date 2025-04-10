@@ -14,6 +14,7 @@ import org.thymeleaf.context.Context;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.time.format.DateTimeFormatter;
 
 @Service
 public class EmailService {
@@ -34,6 +35,9 @@ public class EmailService {
 
     public void enviaEmail(TarefaDTO tarefaDTO){
 
+        DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        DateTimeFormatter horaFmt = DateTimeFormatter.ofPattern("HH:mm");
+
         try{
             MimeMessage mensagem = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mensagem, true, StandardCharsets.UTF_8.name());
@@ -44,7 +48,8 @@ public class EmailService {
 
             Context context = new Context();
             context.setVariable("nomeTarefa", tarefaDTO.getNomeTarefa());
-            context.setVariable("dataEvento", tarefaDTO.getDataEvento());
+            context.setVariable("dataEvento", dateFmt.format(tarefaDTO.getDataEvento()));
+            context.setVariable("horaEvento", horaFmt.format(tarefaDTO.getDataEvento()));
             context.setVariable("descricao", tarefaDTO.getDescricao());
             String template = templateEngine.process("notificacao", context);
             mimeMessageHelper.setText(template, true);
